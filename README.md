@@ -23,14 +23,14 @@ Composer require alkoumi/laravel-safa-sms
 ```
 'providers' => [
       // ...
-      ALkoumi\LaravelSafaSms\SafaSmsServiceProvider::class,
+      Alkoumi\LaravelSafaSms\SafaSmsServiceProvider::class,
 ];
 ```
 
 3. Publish 🥳 the configuration 💼 file using:
 
 ```
-php artisan vendor:publish --provider='ALkoumi\LaravelSafaSms\SafaSmsServiceProvider'
+php artisan vendor:publish --provider='Alkoumi\LaravelSafaSms\SafaSmsServiceProvider'
 ```
 
 4. In your `.env` file add your https://www.safa-sms.com login details like: 
