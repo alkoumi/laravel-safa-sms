@@ -1,7 +1,6 @@
 <p align="center">
 
 [![License](https://poser.pugx.org/alkoumi/laravel-safa-sms/license)](//packagist.org/packages/alkoumi/laravel-safa-sms)
-[![Latest Stable Version](https://poser.pugx.org/alkoumi/laravel-safa-sms/v)](//packagist.org/packages/alkoumi/laravel-safa-sms)
 [![Total Downloads](https://poser.pugx.org/alkoumi/laravel-safa-sms/downloads)](//packagist.org/packages/alkoumi/laravel-safa-sms)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/alkoumi/laravel-safa-sms)
 ![Packagist Version](https://img.shields.io/packagist/v/alkoumi/laravel-safa-sms?color=red)
