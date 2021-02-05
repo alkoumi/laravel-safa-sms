@@ -1,4 +1,12 @@
 <p align="center">
+
+[![License](https://poser.pugx.org/alkoumi/laravel-safa-sms/license)](//packagist.org/packages/alkoumi/laravel-safa-sms)
+[![Latest Stable Version](https://poser.pugx.org/alkoumi/laravel-safa-sms/v)](//packagist.org/packages/alkoumi/laravel-safa-sms)
+[![Total Downloads](https://poser.pugx.org/alkoumi/laravel-safa-sms/downloads)](//packagist.org/packages/alkoumi/laravel-safa-sms)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/alkoumi/laravel-safa-sms)
+![Packagist Version](https://img.shields.io/packagist/v/alkoumi/laravel-safa-sms?color=red)
+![Packagist Stars](https://img.shields.io/packagist/stars/alkoumi/laravel-safa-sms)
+
 </p>
 
 ## مكتبة الرسائل القصيرة لمزود الخدمة صفا للرسائل القصيرة
@@ -11,10 +19,13 @@ This is a Laravel package to send SMS using https://www.safa-sms.com
 Composer require alkoumi/laravel-safa-sms
 ```
 
-2. The service provider will automatically get registered. Or you may manually add the service provider in your `config/app.php` file:
+2. The service provider will automatically registered. Or you may manually do in your `config/app.php` file:
 
 ```
-        ALkoumi\LaravelSafaSms\SafaSmsServiceProvider::class,
+'providers' => [
+      // ...
+      ALkoumi\LaravelSafaSms\SafaSmsServiceProvider::class,
+];
 ```
 
 3. Publish 🥳 the configuration 💼 file using:
@@ -23,7 +34,7 @@ Composer require alkoumi/laravel-safa-sms
 php artisan vendor:publish --provider='ALkoumi\LaravelSafaSms\SafaSmsServiceProvider'
 ```
 
-4. In your `.env` file add your https://www.safa-sms.com login details
+4. In your `.env` file add your https://www.safa-sms.com login details like: 
 
 ```
 SAFA_SMS_USERNAME=username
@@ -33,32 +44,37 @@ SAFA_SMS_ADSSENDER=Ads-sender
 ```
 
 ## Usage [ as elegant as Laravel 💗]
-
+![Shamel](imags/safa-sms.png)
 ```
  use Alkoumi\LaravelSafaSms\Facades\SafaSMS;
 
     $message = 'جعل الله ما قدمتكم نهرًا جاريًا من الحسنات';
     
-    SafaSMS::text($message)                                     // { required } the test message to send
-        ->to(User::all())                                       // { required } as Mixed|array|object|collection
-        ->asFormal()                                            // { optional } the Ads-sender used by default unless you add ->asFormal() 
-        ->removeDuplication()                                   // { optional } to remove the duplicated numbers
-        ->send();                                               // { required } // in the end to send 🧐
+    SafaSMS::text($message)             // { required } the test message to send
+        ->to(User::all())               // { required } as Mixed|array|object|collection
+        ->asFormal()                    // { optional } the Ads-sender used by default unless you add ->asFormal() 
+        ->removeDuplication()           // { optional } to remove the duplicated numbers
+        ->send();                       // { required } at the end to send 🧐
+```
+## Usage in `.blade.php` files get your Balance 😉
+```
+    {{ SafaSMS::getBalance() }}
 ```
 
-1- For one recipient you must pass type `Mixed|Array` like `->to('0500175200')` or `->to(['0500175200'])`.
 
-2- If you have `database` field `$model->mobile` then you can pass `Array|Object|Collection`.
+1- For one recipient, You must pass types `Mixed|Array` like `->to('0500175200')` or `->to(['0500175200'])`.
 
-3- For multiple recipients Just pass type `Array|Object|Collection` in `->to(User::all())`.
+2- If you have `database` field `$model->mobile` then you can pass types `Array|Object|Collection`.
 
-4- If you pass type of `Array|Object|Collection`, We will tack care 😎 of getting mobile numbers.
+3- For multiple recipients, Just pass types `Array|Object|Collection` in `->to(User::all())`.
 
-5- `removeDuplicate()` Will remove all duplicate numbers.
+4- If you pass types of `Array|Object|Collection`, We will tack care 😎 of getting mobile numbers.
 
-6- By default we'll user Ads-sender unless you use `->asFormal()` to use the Formal sender name from www.safa-sms.com.
+5- If you want to remove all duplicate numbers, Just get `removeDuplicate()`.
 
-7- Add `admin_email` in the configuration file `Config\safa-sms.php` to notify Admin the results in every request.
+6- By default Ads sender name will used, unless you add `->asFormal()` to use formal sender name from safa-sms.
+
+7- Add `admin_email` in the `Config\safa-sms.php` to notify Admin with results in every request.
 
 #### Give Me 💗 Cup of ☕️ Coffee here https://patreon.com/mohammadelkoumi
 
