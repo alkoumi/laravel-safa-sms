@@ -125,7 +125,7 @@ class Handler
     protected function sendTheMessage()
     {
         $params = array_merge($this->baseParams(), $this->sendParams());
-        ddd($params);
+        //ddd($params);
         $response = $this->postRequest($this->sendEndpoient, $params);
         return $this->getResponseMessage($response);
     }
