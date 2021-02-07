@@ -24,10 +24,12 @@ class Handler
     private function fetchConfig(): void
     {
         $config = config('safa-sms');
-        foreach ($config as $key => $value) {
-            $this->{$key} = $value;
+        if (isset($config)) {
+            foreach ($config as $key => $value) {
+                $this->{$key} = $value;
+            }
+            $this->sender = $this->ads_sender;
         }
-        $this->sender = $this->ads_sender;
     }
 
     /**

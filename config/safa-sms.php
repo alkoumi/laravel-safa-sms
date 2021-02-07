@@ -18,7 +18,7 @@ return [
     'ads_sender' => env('SAFA_SMS_ADSSENDER'),
 
     // Admin Mobile to notify & Balance to Notify Admin when get this Number
-    'admin_email' => env('SAFA_SMS_ADMINEMAIL', 'it@jubail-dawah.com'),
+    'admin_email' => env('SAFA_SMS_ADMINEMAIL', 'admin@example.com'),
 
     /*
     |--------------------------------------------------------------------------
