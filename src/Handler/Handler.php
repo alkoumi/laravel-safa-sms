@@ -71,6 +71,32 @@ class Handler
     }
 
     /**
+     * @return array
+     */
+    private function baseParams(): array
+    {
+        return $params = [
+            'username' => $this->username,
+            'password' => $this->password,
+            'return' => 'json',
+        ];
+
+    }
+
+    /**
+     * Send the request to Api using Post method
+     *
+     * @param string $endpoint
+     * @param array $parmas
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    private function postRequest($endpoint, array $parmas): ResponseInterface
+    {
+        return $response = $this->client()->post($endpoint, ['form_params' => $parmas]);
+    }
+
+    /**
      * @return Client
      */
     private function client(): Client
@@ -78,6 +104,53 @@ class Handler
         return new Client([
             'base_uri' => $this->base_uri,
         ]);
+    }
+
+    /**
+     * @param $content
+     */
+    protected function notifyAdmin($content): void
+    {
+        //Notify Admin in his Mail About the Sending status
+        $code = isset($content['Code']) ? (int)$content['Code'] : null;
+        $msg = isset($content['MessageIs']) ? (string)$content['MessageIs'] : 'قد يكون تم إرسال الرسالة لكن الخطأ بسبب استخدام الإيموجي 😱';
+        $Blocked = isset($content['Blocked']) ? (string)$content['Blocked'] : null;
+        $lastuserpoints = isset($content['lastuserpoints']) ? (string)$content['lastuserpoints'] : null;
+        $currentuserpoints = isset($content['currentuserpoints']) ? (string)$content['currentuserpoints'] : null;
+        $SMSNUmber = isset($content['SMSNUmber']) ? (string)$content['SMSNUmber'] : null;
+        $totalcout = isset($content['totalcout']) ? (string)$content['totalcout'] : null;
+        $totalsentnumbers = isset($content['totalsentnumbers']) ? (string)$content['totalsentnumbers'] : null;
+
+        Mail::send([], [], function ($message) use ($msg, $Blocked, $lastuserpoints, $currentuserpoints, $SMSNUmber, $totalcout, $totalsentnumbers) {
+            $message->to($this->admin_email)
+                ->subject('حالة إرسال رسالة من حساب شامل الخاص بك - ' . config('app.name'))
+                ->setBody('<h1>' . 'الرسالة : ' . $msg . '</br>' . 'الأرقام المحظورة : ' . $Blocked . '</br>' . 'الرصيد المتبقي  : ' . $currentuserpoints . '</br>' . 'الرسائل المرسلة  : ' . $SMSNUmber . '</br>' . 'الأرقام المرسل إليها  : ' . $totalsentnumbers . '</br>' . Carbon::now() . '</br>' . config('app.name') . '</h1>', 'text/html');
+        });
+    }
+
+    /**
+     * @return string
+     */
+    protected function sendTheMessage()
+    {
+        $params = array_merge($this->baseParams(), $this->sendParams());
+        $response = $this->postRequest($this->sendEndpoient, $params);
+        return $this->getResponseMessage($response);
+    }
+
+    /**
+     * @return array
+     */
+    private function sendParams(): array
+    {
+        $params = [
+            'sender' => $this->sender,
+            'message' => $this->msg,
+            'numbers' => $this->setNumbers($this->numbers),
+            'Rmduplicated' => $this->removeDuplication,
+        ];
+
+        return $params;
     }
 
     /**
@@ -89,6 +162,15 @@ class Handler
     {
         $numbers = $this->removeDuplicate($numbers);
         return $this->parseNumbers($numbers);
+    }
+
+    /**
+     * @param array $numbers
+     * @return array
+     */
+    protected function removeDuplicate(array $numbers): array
+    {
+        return $numbers = array_values(array_unique($numbers));
     }
 
     /**
@@ -111,26 +193,6 @@ class Handler
     }
 
     /**
-     * @param array $numbers
-     * @return array
-     */
-    protected function removeDuplicate(array $numbers): array
-    {
-        return $numbers = array_values(array_unique($numbers));
-    }
-
-    /**
-     * @return string
-     */
-    protected function sendTheMessage()
-    {
-        $params = array_merge($this->baseParams(), $this->sendParams());
-        //ddd($params);
-        $response = $this->postRequest($this->sendEndpoient, $params);
-        return $this->getResponseMessage($response);
-    }
-
-    /**
      * @param $response
      * @return string
      */
@@ -139,11 +201,13 @@ class Handler
         $content = json_decode($response->getBody(), true);
 
         if (!isset($content)) {
-            $content = 'قد يكون تم إرسال الرسالة لكن الخطأ بسبب استخدام الإيموجي 😱';
+            $message = 'قد يكون تم إرسال الرسالة لكن الخطأ بسبب استخدام الإيموجي 😱';
             $this->notifyAdmin($content);
-            abort(403, $content);
+            abort(403, $message);
         }
 
+        $code = (int)$content['Code'];
+        $message = (string)$content['MessageIs'];
         //$message = ResponseMsg::{$endpoint}($code);
 
         $this->notifyAdmin($content);
@@ -153,69 +217,6 @@ class Handler
         }
 
         return $message;
-    }
-
-    /**
-     * @param $content
-     */
-    protected function notifyAdmin($content): void
-    {
-        //Notify Admin in his Mail About the Sending status
-        $code = (int)$content['Code'];
-        $message = (string)$content['MessageIs'];
-        $Blocked = (string)$content['Blocked'];
-        $lastuserpoints = (string)$content['lastuserpoints'];
-        $currentuserpoints = (string)$content['currentuserpoints'];
-        $SMSNUmber = (string)$content['SMSNUmber'];
-        $totalcout = (string)$content['totalcout'];
-        $totalsentnumbers = (string)$content['totalsentnumbers'];
-
-        Mail::send([], [], function ($message) use ($content) {
-            $message->to($this->admin_email)
-                ->subject('حالة إرسال رسالة من حساب شامل الخاص بك - ' . config('app.name'))
-                ->setBody('<h1>' . $content . '</br>' . $message . 'الرسالة : ' . '</br>' . $Blocked . 'الأرقام المحظورة : ' . '</br>' . $currentuserpoints . 'الرصيد المتبقي  : ' . '</br>' . $SMSNUmber . 'الرسائل المرسلة  : ' . '</br>' . $totalsentnumbers . 'الأرقام المرسل إليها  : ' . '</br>' . Carbon::now() . '</br>' . config('app.name') . '</h1>', 'text/html');
-        });
-    }
-
-    /**
-     * Send the request to Api using Post method
-     *
-     * @param string $endpoint
-     * @param array $parmas
-     *
-     * @return \Psr\Http\Message\ResponseInterface
-     */
-    private function postRequest($endpoint, array $parmas): ResponseInterface
-    {
-        return $response = $this->client()->post($endpoint, ['form_params' => $parmas]);
-    }
-
-    /**
-     * @return array
-     */
-    private function baseParams(): array
-    {
-        return $params = [
-            'username' => $this->username,
-            'password' => $this->password,
-            'return' => 'json',
-        ];
-
-    }
-
-    /**
-     * @return array
-     */
-    private function sendParams(): array
-    {
-        $params = [
-            'sender' => $this->sender,
-            'message' => $this->msg,
-            'numbers' => $this->setNumbers($this->numbers),
-            'Rmduplicated' => $this->removeDuplication,
-        ];
-
-        return $params;
     }
 
 }
