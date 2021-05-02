@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 class SafaSMS extends Handler
 {
-    protected $numbers = [];
+    protected $numbers;
     protected $msg;
     protected $removeDuplication = 0;
 
@@ -18,23 +18,23 @@ class SafaSMS extends Handler
      */
     public function to($mobileNumbers)
     {
-        // $to Numbers Passed is empty
-        !$mobileNumbers ?? abort(403, 'إنتبه بارك الله فيك! لم تدخل الأرقام 🤯');
-
         // Get the Numbers from the data
         if ($mobileNumbers instanceof Collection || $mobileNumbers instanceof \Illuminate\Support\Collection || $mobileNumbers instanceof Builder) {
-            $numbers = $mobileNumbers->pluck('mobile')->toArray();
-            $this->numbers = array_merge($numbers, $this->numbers);
+            $this->numbers = $mobileNumbers->pluck('mobile')->toArray();
         } elseif (is_object($mobileNumbers) && isset($mobileNumbers->mobile)) {
-            $this->numbers[] = $mobileNumbers->mobile;
+            $this->numbers = [$mobileNumbers->mobile];
         } elseif (is_array($mobileNumbers)) {
-            $this->numbers = array_merge($mobileNumbers, $this->numbers);
+            $this->numbers = $mobileNumbers;
         } elseif (is_numeric($mobileNumbers)) {
-            $this->numbers[] = $mobileNumbers;
+            $this->numbers = [$mobileNumbers];
         } else {
-            $content = 'لم نتمكن من استخراج الأرقام من فضلك تأكد من إضافة ابزرقام المراد إرسالها بشكل صحيح';
+            $content = 'لم نتمكن من استخراج الأرقام من فضلك تأكد من إضافة الارقام المراد إرسالها بشكل صحيح';
             $this->notifyAdmin($content);
             abort(403, $content);
+        }
+
+        if (empty($this->numbers)){
+            abort(403, 'إنتبه بارك الله فيك! لا يوجد أرقام جوالات صالحة 🤯');
         }
 
         return $this;
@@ -46,7 +46,10 @@ class SafaSMS extends Handler
      */
     public function text($msgText)
     {
-        !$msgText ?? abort(403, 'إنتبه بارك الله فيك! لم تدخل رسالة لإرسالها 🤯');
+        if (empty($msgText)){
+            abort(403, 'إنتبه بارك الله فيك! لا يوجد أرقام جوالات صالحة 🤯');
+        }
+
         $this->msg = $msgText;
         return $this;
     }

@@ -27,7 +27,7 @@ Composer require alkoumi/laravel-safa-sms
 ];
 ```
 
-3. Publish 🥳 the configuration 💼 file using:
+3. Publish 🥳 the configuration 💼 file using
 
 ```
 php artisan vendor:publish --provider='Alkoumi\LaravelSafaSms\SafaSmsServiceProvider'
@@ -41,6 +41,7 @@ SAFA_SMS_PASSWORD=password
 SAFA_SMS_FORMALSENDER=formal-sender
 SAFA_SMS_ADSSENDER=Ads-sender
 ```
+5- Don't forget to `php artisan config:cache` after editing `.env` file
 
 ## Usage [ as elegant as Laravel 💗]
 ![Shamel](imags/safa-sms.png)
@@ -57,7 +58,7 @@ SAFA_SMS_ADSSENDER=Ads-sender
 ```
 ## Usage in `.blade.php` files get your Balance 😉
 ```
-    {{ SafaSMS::getBalance() }}
+    {{ SafaSMS::getBalance() }}         // Return (int) 1345 
 ```
 
 
